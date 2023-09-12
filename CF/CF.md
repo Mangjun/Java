@@ -162,3 +162,36 @@ key와 value의 쌍으로 이루어져 있으며, 순서는 없고 키는 중복
 | Collection values() | Map에 저장된 value를 반환하는 메서드 |
 
 Map.Entry 인터페이스는 Map 인터페이스의 내부 인터페이스로 Map 인터페이스를 구현하는 클래스에서는 Map.Entry 인터페이스도 함께 구현해야 한다.   
+
+## Iterator, ListIterator, Enumeration
+Collection에 저장된 요소를 접근하는데 사용되는 인터페이스이다.   
+
+### Iterator
+컬렉션에 저장된 요소들을 읽어오는 방법을 표준화한 것이다.   
+표준화한 이유는 데이터를 저장하는 구조가 다르기 때문이다.   
+1회용이므로 사용하면 다시 호출을 해야한다.   
+Iterator의 메서드는 다음과 같다.   
+
+| 메서드 | 설명 |
+| :---: | --- |
+| boolean hasNext() | 읽어 올 요소가 남아있는지 확인하는 메서드 |
+| Object next() | 다음 요소를 읽어 오는 메서드 |
+| void remove() | next()로 읽어 온 요소를 삭제하는 메서드(반드시 구현하지 않아도 된다.) |
+
+Map 인터페이스를 구현한 클래스는 iterator()를 직접 호출할 수 없고 keySet()이나 entrySet()를 통해 Set의 형태로 얻어 온 후에 호출할 수 있다.   
+
+### Enmeration
+Enumeration는 iterator의 구 버전이므로 가능하면 사용하지 않는다.   
+
+### ListIterator
+ListIterator는 iterator를 상속받아서 기능을 추가한 것으로, iterator는 단방향만 이동할 수 있지만 ListIterator는 양방향으로 이동이 가능하다.   
+하지만 ListIterator는 List 인터페이스를 구현한 Collection에서만 사용할 수 있다.   
+
+ListIterator의 메서드는 다음과 같다.   
+
+| 메서드 | 설명 |
+| :---: | --- |
+| boolean hasPrevious() | 읽어 올 이전 요소가 남아있는지 확인하는 메서드 |
+| Object previous() | 이전 요소를 읽어 오는 메서드 |
+| int nextIndex() | 다음 요소의 index를 반환하는 메서드 |
+| int previousIndex() | 이전 요소의 index를 반환하는 메서드 |
