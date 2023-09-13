@@ -140,7 +140,46 @@ BlockingQueue는 멀티쓰레드에서 사용하며, 비어있을 때 꺼내기�
 
 ## Set
 순서가 없고 데이터의 중복을 허용하지 않는 인터페이스이다.   
+순서가 없어서 정렬이 불가능하다.   
 Collection의 메서드와 동일하다.   
+
+### HashSet
+Set 인터페이스를 구현한 대표적인 컬렉션이다.   
+순서를 유지하려면 LinkedHashSet 클래스를 사용하면 된다.   
+
+HashSet의 add()는 사용할 때 equals()와 hashCode()를 호출한다.   
+따라서, equals()와 hashCode()가 오버라이딩이 되어 있어야 한다.   
+
+hashCode()의 오버라이딩 조건은 다음과 같다.   
+1. 동일 객체에 대해 hashCode()를 여러 번 호출해도 동일한 값을 반환해야 한다.
+2. equals()로 비교해서 true로 얻은 두 객체의 hashCode()값은 일치해야 한다.
+3. equals()로 비교한 결과가 false인 두 객체의 hashCode()값이 같을 수도 있지만 서로 다른 값을 반환하도록 작성한다.(성능 향상)
+
+오버라이딩을 할 때 java.util.Objects 클래스의 hash() 괄호 안에 클래스의 인스턴스 변수들을 넣으면 된다.   
+
+### TreeSet
+이진 검색 트리라는 자료구조의 형태로 데이터를 저장하는 컬렉션 클래스이다.   
+범위 검색과 정렬에 유리한 컬렉션 클래스이고, HashSet보다 데이터 추가, 삭제에 시간이 더 걸린다.   
+이진 검색 트리는 부모보다 작은 값을 왼쪽에, 큰 값은 오른쪽에 저장을 한다.   
+
+TreeSet에 추가되는 객체는 비교 기준을 가져야하거나, TreeSet이 비교 기준을 가져야한다.   
+그렇지 않으면, 두 번째 객체를 저장할 때 예외가 발생한다.   
+
+TreeSet의 메서드는 다음과 같다.   
+
+| 메서드 | 설명 |
+| :---: | --- |
+| TreeSet(Collection c) | 주어진 컬렉션을 저장하는 TreeSet을 생성하는 생성자 |
+| TreeSet(Comparator comp) | 주어진 정렬기준으로 정렬하는 TreeSet을 생성하는 생성자 |
+| Object first() | 정렬된 순서에서 첫 번째 객체를 반환하는 메서드 |
+| Object last() | 정렬된 순서에서 마지막 객체를 반환하는 메서드 |
+| Object pollFirst() | TreeSet의 첫 번째 요소를 반환하는 메서드 |
+| Object pollLast() | TreeSet의 마지막 요소를 반환하는 메서드 |
+| Object ceiling(Object o) | 지정된 객체와 같은 객체를 반환하는 메서드(없으면 큰 값을 가진 객체 중 제일 가까운 값의 객체를 반환한다.) |
+| Object floor(Object o) | 지정된 객체와 같은 객체를 반환하는 메서드(없으면 작은 값을 가진 객체 중 제일 가까운 값의 객체를 반환한다.) |
+| SortedSet subSet(Object fromElement, Object toElement) | 범위 검색의 결과를 반환하는 메서드(toElement는 범위에 포함되지 않는다.) |
+| SortedSet headSet(Object toElement) | 지정된 객체보다 작은 값의 객체들을 반환하는 메서드 |
+| SortedSet tailSet(Object fromElement) | 지정된 객체보다 큰 값의 객체들을 반환하는 메서드 |
 
 ## Map
 key와 value의 쌍으로 이루어져 있으며, 순서는 없고 키는 중복을 허용하지 않고, 값은 중복을 허용하는 인터페이스이다.   
@@ -162,6 +201,67 @@ key와 value의 쌍으로 이루어져 있으며, 순서는 없고 키는 중복
 | Collection values() | Map에 저장된 value를 반환하는 메서드 |
 
 Map.Entry 인터페이스는 Map 인터페이스의 내부 인터페이스로 Map 인터페이스를 구현하는 클래스에서는 Map.Entry 인터페이스도 함께 구현해야 한다.   
+
+### HashMap
+해싱 기법으로 데이터를 저장하는 클래스이며 데이터가 많아도 검색이 빠르다.   
+
+#### 해싱 기법
+해시 함수를 이용해서 해시 테이블에서 데이터를 저장 및 검색하는 기법이다.   
+해시 테이블은 배열과 링크드리스트가 조합된 형태인데, 배열의 장점인 접근성과 링크드리스트의 장점인 변경 유리를 채용한 것이다.   
+
+해시 테이블에 저장된 데이터를 가져오는 과정은 다음과 같다.   
+1. 키로 해시 함수를 호출해서 해시 코드(배열의 index)를 얻는다.
+2. 해시 코드에 대응하는 링크드리스트를 배열에서 찾는다.
+3. 링크드리스트에서 키와 일치하는 데이터를 찾는다.
+
+equals()는 hashCode()의 반환값이 같아야 같은 객체로 인식하기 때문에 equals()를 오버라이딩해야 된다면 hashCode()도 같이 오버라이딩해줘야 한다.   
+
+HashMap의 실제 소스는 다음과 같다.   
+```
+public class HashMap extends AbstractMap implements Map, Cloneable, Serializable {   
+    transient Entry[] table;   
+    ... // 일부 생략   
+    static class Entry implements Map.Entry {   
+        final Object key;   
+        Object value;   
+        ... // 일부 생략   
+    }   
+}
+```
+
+Entry라는 내부 클래스를 정의하고, Entry타입의 배열을 선언하고 있는 이유는 키와 값이 서로 관련된 값이므로 하나의 배열로 다루는 것이 데이터의 무결성적인 측면에서 바람직하기 때문이다.   
+
+HashMap의 메서드는 다음과 같다.   
+
+| 메서드 | 설명 |
+| :---: | --- |
+| HashMap(int initialCapacity) | 지정된 값을 초기 용량으로 갖는 HashMap 객체를 생성하는 생성자 |
+| HashMap(Map m) | 지정된 Map의 모든 요소를 포함하는 HashMap 객체를 생성하는 생성자 |
+| Object put(Object key, Object value) | 지정된 키와 값을 저장하는 메서드 |
+| Object remove(Object key) | 지정된 키로 저장된 값을 제거하는 메서드 |
+| Object replace(Object key, Object value) | 지정된 키의 값을 지정된 값으로 변경하는 메서드 |
+| boolean containsKey(Object key) | HashMap에 키가 포함되어 있는지 확인하는 메서드 |
+| boolean containsValue(Object value) | HashMap에 값이 포함되어 있는지 확인하는 메서드 |
+| void putAll(Map m) | Map에 저장된 모든 요소를 HashMap에 저장하는 메서드 |
+
+### TreeMap
+이진 검색 트리의 형태로 키와 값의 쌍으로 이루어진 데이터를 저장하는 클래스이다.   
+대부분의 경우에서 HashMap이 TreeMap보다 더 뛰어나므로 HashMap을 사용하는 것이 좋지만, 범위검색이나 정렬이 필요한 경우에는 TreeMap을 사용한다.   
+
+### Properties
+HashMap의 구 버전인 Hashtable을 상속받아 구현한 것으로 키와 값을 String으로 저장하는 클래스이다.   
+주로 애플리케이션의 환경설정과 관련된 속성을 저장하는데 사용되며 데이터를 파일로부터 읽고 쓰는 편리한 기능을 제공한다.   
+
+Properties의 메서드는 다음과 같다.   
+
+| 메서드 | 설명 |
+| :---: | --- |
+| Properties(ProPerties defaults) | 지정된 Properties에 저장된 목록을 가진 Properties 객체를 생성하는 생성자 |
+| String getProperty(String key) | 지정된 키의 값을 반환하는 메서드 |
+| void list(PrintStream out) | 지정된 PrintStream에 저장된 목록을 출력하는 메서드 |
+| void load(InputStream inStream) | 지정된 InputStream으로부터 목록을 읽어서 저장하는 메서드 |
+| void store(OutputStream out, String comments) | 저장된 목록을 지정된 OutputStream에 출력하는 메서드(comments는 목록에 대한 주석으로 저장된다.) |
+| Set stringPropertyNames() | Propertyies에 저장되어 있는 모든 키를 Set에 담아서 반환하는 메서드 |
 
 ## Iterator, ListIterator, Enumeration
 Collection에 저장된 요소를 접근하는데 사용되는 인터페이스이다.   
@@ -195,3 +295,72 @@ ListIterator의 메서드는 다음과 같다.
 | Object previous() | 이전 요소를 읽어 오는 메서드 |
 | int nextIndex() | 다음 요소의 index를 반환하는 메서드 |
 | int previousIndex() | 이전 요소의 index를 반환하는 메서드 |
+
+## Arrays
+배열을 다루는데 유용한 메서드가 정의되어 있는 클래스이다.   
+
+다음의 메서드들이 정의되어 있다.   
+
+| 메서드 | 설명 |
+| :---: | --- |
+| String toString(arr) | 배열을 출력하는 메서드  |
+| String deepToString(arr) | 다차원 배열을 출력하는 메서드 |
+| Object[] copyOf(arr) | 배열을 복사하는 메서드 |
+| Object[] copyOfRange(arr, int from, int to) | 배열의 일부를 복사하는 메서드 |
+| fill() | 배열의 모든 요소를 지정된 값으로 채우는 메서드 |
+| boolean equals(arr1, arr2) | 배열의 모든 요소가 같은지 확인하는 메서드 |
+| boolean deepEquals(arr1, arr2) | 다차원 배열의 모든 요소가 같은지 확인하는 메서드 |
+| Object[] sort() | 배열을 정렬하는 메서드 |
+| int binarySearch(arr, Object) | 배열에서 지정된 값이 저장된 index를 반환하는 메서드(반드시 배열이 정렬되어 있어야함) |
+| List asList(Object... a) | 배열을 List에 담아서 반환하는 메서드 |
+
+## Comparator와 Comparable
+객체를 정렬하는데 필요한 메서드를 정의한 인터페이스이다.   
+정렬을 하려면 대상과 기준이 필요한데 기준을 제공하는 인터페이스이다.   
+
+### Comparable
+java.lang 패키지에 속하며 기본 정렬기준을 구현하는데 사용한다.   
+
+실제 소스는 다음과 같다.   
+```
+public interface Comparable {   
+    public int compareTo(Object o);   
+}
+```
+
+### Comparator
+java.util 패키지에 속하며 기본 정렬기준 외에 다른 기준으로 정렬하고자할 때 사용한다.   
+
+실제 소스는 다음과 같다.   
+```
+public interface Comparator {   
+    int compare(Object o1, Object o2);   
+    boolean equals(Object obj);   
+}
+```
+
+compare()와 compareTo()는 두 객체의 비교결과를 반환하도록 작성되었고, 같으면 0, 오른쪽이 크면 음수(-), 작으면 양수(+)를 반환한다.   
+
+## Collections
+컬렉션과 관련된 static 메서드를 제공한다.   
+
+1. 컬렉션 채우기, 복사, 정렬, 검색 - fill(), copy(), sort(), binarySearch() 등
+2. 컬렉션 동기화 - synchronizedXXX()
+3. 변경불가 컬렉션 만들기 - unmodifiableXXX()
+4. 싱글톤 컬렉션 만들기 - singletonXXX()
+5. 한 종류의 객체만 저장하는 컬렉션 만들기 - checkedXXX()
+
+## 상황별 컬렉션 클래스
+
+| 컬렉션 | 특 징 |
+| :---: | --- |
+| ArrayList | 배열기반이며 데이터의 추가와 삭제에 불리하고, 순차적인 추가 및 삭제는 제일 빠르다.<br>임의의 요소에 대한 접근성이 뛰어나다. |
+| LinkedList | 연결기반이며 데이터의 추가와 삭제에 유리하고, 임의의 요소에 대한 접근성이 좋지 않다. |
+| HashMap | 배열과 연결이 결합된 형태이며 추가, 삭제, 검색, 접근성이 모두 뛰어나다.<br>검색에는 최고성능을 보인다. |
+| TreeMap | 연결기반이며 정렬과 범위 검색에 적합하다. |
+| Stack | Vector를 상속받아서 구현했다.(LIFO) |
+| Queue | LinkedList가 Queue 인터페이스를 구현했다.(FIFO) |
+| Properties | Hashtable을 상속받아 구현했으며 키와 값을 문자열로 저장한다. |
+| HashSet | HashMap을 이용해서 구현했다. |
+| TreeSet | TreeMap을 이용해서 구현했다. |
+| LinkedHashMap<br>LinkedHashSet | HashMap과 HashSet에 저장 순서 유지기능을 추가하였다. |
