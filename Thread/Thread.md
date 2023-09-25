@@ -187,3 +187,111 @@ InterruptedException 예외처리를 해야한다.
 4. 실행 중에 일시정지 상태가 될 수 있다.
 5. 지정된 일시정지 시간이 다 되거나 notify(), resume(), interrupt()가 호출되면 일시정지 상태를 벗어나 다시 실행 대기열에 저장되어 자신의 차례를 기다리게 된다.
 6. 실행을 모두 마치거나 stop()이 호출되면 쓰레드는 소멸된다.
+
+## 쓰레드의 동기화
+한 쓰레드가 진행 중인 작업을 다른 쓰레드가 간섭하지 못하도록 막는 것을 의미한다.   
+공유 데이터를 사용하는 코드 영역을 임계 영역으로 지정해놓고, lock을 획득한 단 하나의 쓰레드만 영역 내의 코드를 수행하도록 한다.   
+
+* 동기화가 필요한 이유: 멀티 쓰레드 프로세스의 경우 여러 쓰레드가 같은 프로세스 내의 자원을 공유해서 작업하기 때문에 서로의 작업에 영향을 주게 되어 의도했던 것과는 다른 결과를 얻을 수 있기 때문이다.   
+
+### synchronized를 이용한 동기화
+synchronized 키워드를 이용한 동기화의 방식은 두 가지가 있다.   
+
+* 메서드 전체를 임계 영역으로 지정
+  ```
+  public synchronized void print() {   
+    // 임계 영역   
+  }
+  ```
+
+* 특정한 영역을 임계 영역으로 지정
+  ```
+  synchronized(객체의 참조변수) {   
+    // 임계 영역   
+  }
+  ```
+
+한 번에 한 쓰레드만 실행하므로 임계 영역은 최소화하여 효율적인 프로그램을 작성해야 한다.   
+또한, 동기화 블럭 내에 있는 변수는 private으로 해야한다.   
+
+한 번에 한 쓰레드만 실행할 수 있으므로 특정 쓰레드가 lock을 가진 상태로 오랜 시간을 보낸다면 다른 쓰레드들의 작업들이 원활히 진행하지 못 한다.   
+
+#### wait(), notify(), notifyAll()
+동기화의 효율을 높이기 위해 사용한다.   
+Object클래스에 정의되어 있으며, 동기화 블록 내에서만 사용할 수 있다.   
+
+* wait(): 객체의 lock을 풀고 쓰레드를 해당 객체의 waiting pool에 넣는다.
+* notify(): waiting pool에서 대기중인 쓰레드 중의 하나를 깨운다.
+* notifyAll(): waiting pool에서 대기중인 모든 쓰레드를 깨운다.
+
+wait()과 notify()는 어떤 객체를 깨울지 불분명하다.   
+그래서 기아 현상과 경쟁 상태가 나타나는데 이것을 해결한 것이 Lock과 Condition이다.   
+
+### Lock과 Condition을 이용한 동기화
+Lock클래스의 종류는 다음과 같다.   
+* ReentrantLock: 가장 일반적인 배타 lock이며, 재진입이 가능하다.
+* ReentrantReadWriteLock: 읽기에는 공유적이고 쓰기에는 배타적인 lock이다.
+* StampedLock: ReentrantReadWriteLock에 낙관적인 lock(일단 무조건 저지르고 나중에 확인하는 기능)을 추가한 것이다.
+
+Lock을 사용하는 동기화 방법은 다음과 같다.   
+```
+lock.lock();   
+try {   
+  // 임계 영역   
+} finally {   
+  lock.unlock();   
+}
+```
+   
+ReentrantLock의 메서드는 다음과 같다.   
+
+| 메서드 | 설 명 |
+| --- | --- |
+| ReentrantLock() | 기본 생성자 |
+| ReentrantLock(boolean fair) | fair를 true로 주면 가장 오래 기다린 쓰레드가 lock을 획득할 수 있게 하는 생성자(성능 저하) |
+| void lock() | lock을 잠구는 메서드 |
+| void unlock() | lock을 해지하는 메서드 |
+| boolean isLocked() | lock이 잠겼는지 확인하는 메서드 |
+
+Condition의 생성 방법은 다음과 같다.   
+```
+private ReentrantLock lock = new ReentrantLock();   
+private Condition condition = lock.newCondition();
+```
+   
+Condition의 메서드는 다음과 같다.   
+
+| 메서드 | 설 명 |
+| --- | --- |
+| void await() | wait()과 동일 |
+| void signal() | notify()과 동일 |
+| void signalAll() | notifyAll()과 동일 |
+
+## volatile
+cache와 메모리간의 불일치를 해소하기 위한 키워드이다.   
+컴퓨터는 성능 향상을 위해 변수의 값을 core의 cache에 저장해놓고 작업을 해서   
+도중에 메모리에서 값이 변경되었는데도 cache에 저장된 값은 갱신되지 않아서 값이 다른 경우가 발생한다.   
+
+이러한 경우에 volatile을 사용하면 변수의 값을 읽어올 때 메모리에서 읽어온다.   
+
+## fork & join 프레임워크
+여러 쓰레드가 동시에 처리하는 것을 쉽게 만들어주는 프레임워크이다.   
+
+* fork(): 해당 작업을 쓰레드 풀의 작업 큐에 넣는다.(비동기 메서드)
+* join(): 해당 작업의 수행이 끝날 때까지 기다렸다가, 수행이 끝나면 그 결과를 반환한다.(동기 메서드)
+
+수행할 작업에 따라 두 클래스 중에서 하나를 상속받아 추상 메서드 compute()를 구현해야 한다.   
+* RecursiveAction: 반환값이 없는 작업을 구현할 때 사용
+* RecursiveTask: 반환값이 있는 작업을 구현할 때 사용
+
+fork()로 나눈 작업을 큐에 넣고, compute()를 재귀호출해서 구현한다.   
+  
+다음과 같이 작업을 시작한다.   
+```
+ForkJoinPool pool = new ForkJoinPool(); // 쓰레드 풀(코어의 개수와 동일한 개수)을 생성   
+V task = new V(); // 수행할 작업을 생성   
+V result = pool.invoke(task);
+```
+
+### 작업 훔치기
+자신의 작업 큐가 비어있는 쓰레드는 다른 쓰레드의 작업 큐에서 작업을 가져와서 수행한다.   
