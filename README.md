@@ -13,7 +13,7 @@ Java의 문법들을 정리한 파일 저장소
 | Thread | [MD](https://github.com/Mangjun/Java/blob/main/Thread/Thread.md) |
 | Lambda | [MD](https://github.com/Mangjun/Java/blob/main/Lambda/Lambda.md) |
 | Stream | [MD](https://github.com/Mangjun/Java/blob/main/Stream/Stream.md) |
-| I/O | [MD]() |
+| I/O | [MD](https://github.com/Mangjun/Java/blob/main/IO/IO.md) |
 | Network | [MD](https://github.com/Mangjun/Java/blob/main/Network/Network.md) |
 
 # Code
@@ -24,7 +24,7 @@ Java의 문법들을 정리한 파일 저장소
 | Thread | [Code](https://github.com/Mangjun/Java/tree/main/Thread/Code) |
 | Lambda | [Code](https://github.com/Mangjun/Java/tree/main/Lambda/Code) |
 | Stream | [Code](https://github.com/Mangjun/Java/tree/main/Stream/Code) |
-| I/O | [Code]() |
+| I/O | [Code](https://github.com/Mangjun/Java/tree/main/IO/Code) |
 | Network | [Code](https://github.com/Mangjun/Java/tree/main/Network/Code) |
 
 # 참고 자료
